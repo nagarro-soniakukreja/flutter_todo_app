@@ -1,7 +1,9 @@
 
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertodoapp/model/user_todo.dart';
 import 'package:http/http.dart' as Client;
 
 
@@ -13,7 +15,7 @@ class TodoList extends StatefulWidget {
 
 class _TodoListState extends State<TodoList> {
 
-  List widgets = [];
+  List<UserTodo> widgets = [];
   bool showError = false;
 
   @override
@@ -81,8 +83,8 @@ class _TodoListState extends State<TodoList> {
             padding: EdgeInsets.all(10.0),
             child: Card(
               child: ListTile(
-                title: Text(widgets[pos]['title']),
-                subtitle: Text(widgets[pos]['completed'].toString()),
+                title: Text(widgets[pos].title),
+                subtitle: Text(widgets[pos].completed.toString()),
               ),
             ),
           );
@@ -101,7 +103,7 @@ class _TodoListState extends State<TodoList> {
     setState(() {
         if (response != null && response.statusCode == 200) {
           showError = false;
-          widgets = json.decode(response.body);
+          widgets = parseTodo(response.body);
         } else {
           showError = true;
         }
@@ -109,6 +111,10 @@ class _TodoListState extends State<TodoList> {
     }
 
 
+  List parseTodo(String body) {
+    final parsed = json.decode(body).cast<Map<String, dynamic>>();
 
+    return parsed.map<UserTodo>((json) => UserTodo.fromJson(json)).toList();
   }
+}
 
